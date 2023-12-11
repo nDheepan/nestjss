@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>User Form</title>
+</head>
+<body>
+  <h1>User Form</h1>
+  <form id="userForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <br>
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" required>
+    <br>
+    <label for="gender">Gender:</label>
+    <select id="gender" name="gender" required>
+      <option value="m">Male</option>
+      <option value="f">Female</option>
+      <option value="u">Unspecified</option>
+    </select>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="button" onclick="submitForm()">Add User</button>
+  </form>
+
+  <hr>
+
+  <h2>User Details</h2>
+  <ul id="userList"></ul>
+
+  <script>
+   async function submitForm() {
+      const form = document.getElementById('userForm');
+      const formData = new FormData(form);
+      const response = await fetch('/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+
+      if (response.ok) {
+        alert('User added successfully!');
+        loadUsers();
+      } else {
+        alert('Failed to add user!');
+      }
+    }
+
+    async function loadUsers() {
+      const response = await fetch('/user');
+      const userList = document.getElementById('userList');
+
+      if (response.ok) {
+        const users = await response.json();
+
+        // Clear previous user list
+        userList.innerHTML = '';
+
+        // Display user details
+        users.forEach((user) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `ID: ${user.id}, Name: ${user.name}, Username: ${user.username}, Email: ${user.email}, Age: ${user.age}, Gender: ${user.gender}`;
+          userList.appendChild(listItem);
+        });
+      } else {
+        alert('Failed to load users!');
+      }
+    }
+
+    // Load users on page load
+    document.addEventListener('DOMContentLoaded', loadUsers);
+  </script>
+</body>
+</html>
